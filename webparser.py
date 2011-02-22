@@ -146,6 +146,7 @@ class webparser:
         plist = soup.findAll('p')
         for item in plist:
             abloc = item.find('a')
+            if abloc == None : continue
             
             # get shop rank information
             if (('class' in dict(abloc.attrs)) and ('rank' == abloc['class']) and ('href' in dict(abloc.attrs))):
