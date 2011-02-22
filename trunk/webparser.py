@@ -186,12 +186,13 @@ class webparser:
         pagenum = self.getscopbytagattr(souplist[0], 'span', 'class', 'page-info')
         if (len(pagenum) < 1) : return 0
         
+        print 'Raw total page number info : %s' % pagenum[0].text
+        
         numlist = self.gettextonly(pagenum[0]).split('/')
         if (len(numlist) < 1) : return 0
         
         total = int(numlist[1])
         
         print 'Total page number is : %d' % total
-        self.hastotalpage = True
-        return total
+        return (total, True)
     
