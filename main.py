@@ -7,22 +7,31 @@ Created on Feb 22, 2011
 import time
 from webspider import webspider
 from webparser import webparser
+from browser import mybrowser
 
 def main(url):
     ws = webspider()
-    ws.setProxy('10.235.96.250', 'axdsp', 'wel57come')
+    mb = mybrowser()
+    
+    #ws.setProxy('10.235.96.250', 'axdsp', 'wel57come')
+    mb.setCookie()
+    mb.setbrowseroptions()
+    mb.setagent()
     
     count = 1
     totalpage = 0
+    hastotalpage = False
     while (url != None):
-        page = ws.getpagebyurl(url)
+        #page = ws.getpagebyurl(url)
+        #page = ws.getpagebyurlwithheader(url)
+        page = mb.getpagebyurl(url)
         wp = webparser('taobao', page) 
         wp.parsepage()
         url = wp.getnext()
         print "== Parse Page %d finished ==" % count
 
-        if (wp.hastotalpage == False):
-            totalpage = wp.gettotalpagenumber()
+        #if (hastotalpage == False):
+        (totalpage, hastotalpage) = wp.gettotalpagenumber()
             
         if (count < totalpage): 
             count = count + 1
