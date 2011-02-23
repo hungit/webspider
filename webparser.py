@@ -54,6 +54,35 @@ class webparser:
         else:
             return v.encode(ENCODING)
     
+    def parseproductcat(self):
+        souplist = self.getscopbytagattr(self.soup, 'div', 'class', 'box-main cats')
+        if (len(souplist) > 0):
+            souplist = self.getscopbytagattr(souplist[0], 'div', 'class', 'bd')
+            if (len(souplist) > 0):
+                catlist = self.gettableitem(souplist[0], 'dl')
+        
+        # shop list
+        shoplist = []
+        
+        for item in catlist:
+            # get cat name
+            catname = self.gettablescop(item, 'dt')
+            if (catname != None):
+                print 'Shop cat name: %s' % self.gettextonly(catname)
+                
+            # get cat list
+            catlistscop = self.gettablescop(item, 'dd')
+            if (catlistscop != None):
+                catlist = self.gettableitem(item, 'a')
+                
+            for catitem in catlist:
+                if ('href' in dict(catitem.attrs)):
+                   shoplist.append(catitem['href'])
+                   print 'Shop list name : %s' % self.gettextonly(catitem)
+                   print 'Shop list link : %s' % catitem['href']
+        
+        return shoplist
+        
     def parseproductlist(self):
         soup = self.getscopbydiv(self.soup, 'main-content')
         soup = self.gettablescop(soup, 'tbody')
