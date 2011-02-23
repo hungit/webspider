@@ -14,6 +14,7 @@ def main(url):
     mb = mybrowser()
     
     #ws.setProxy('10.235.96.250', 'axdsp', 'wel57come')
+    mb.setProxy('10.235.96.250:8080', 'axdsp', 'wel57come')
     mb.setCookie()
     mb.setbrowseroptions()
     mb.setagent()

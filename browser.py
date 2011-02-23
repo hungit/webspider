@@ -9,6 +9,12 @@ class mybrowser:
     def setCookie(self):
         cj = cookielib.LWPCookieJar()
         self.br.set_cookiejar(cj)
+    
+    def setProxy(self, proxy, user, password):
+        self.br.set_proxies({
+            "http": proxy,
+        })
+        self.br.add_proxy_password(user, password)
         
     def setbrowseroptions(self):
         self.br.set_handle_equiv(True)
