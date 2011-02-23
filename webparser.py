@@ -14,9 +14,13 @@ class webparser:
         self.soup = BeautifulSoup(html)
         self.dict = []
         self.hastotalpage = False
+        self.ratelinklist = []
         
     def __del__(self):
-        self.name = ''
+        self.name = None
+        self.dict = None
+        self.ratelinklist = None
+        del self.soup
         
     def getscopbydiv(self, soup, divid=''):
         if divid != '':
@@ -181,6 +185,7 @@ class webparser:
             if (('class' in dict(abloc.attrs)) and ('rank' == abloc['class']) and ('href' in dict(abloc.attrs))):
                 print '%s :' % self.gettextonly(abloc)
                 print '%s' % abloc['href']
+                self.ratelinklist.append(abloc['href'])
                 
             # get shop score information
             if (('class' in dict(abloc.attrs)) and ('score' == abloc['class']) and ('data-score' in dict(abloc.attrs))):
@@ -189,6 +194,52 @@ class webparser:
                 
         return 'product rate'
     
+    def parseproductratedetail(self, soup):
+        dynamicrate = self.getscopbydiv(soup, 'dynamic-rate')
+        if (dynamicrate != None):
+            sixmonth = self.getscopbydiv(dynamicrate, 'sixmonth')
+            rateinfo = self.gettablescop(sixmonth, 'ul')
+            if (rateinfo != None):
+                rateinfobloclist = self.gettableitem(rateinfo, 'li')
+                for item in rateinfobloclist:
+                    self.parseproductratedetailitem(item)
+            
+    def parseproductratedetailitem(self, soup):
+        # get item scription
+        itemscrib = self.getscopbytagattr(soup, 'div', 'class', 'item-scrib')
+        if (len(itemscrib) > 0):
+            title = self.gettextonly(self.gettablescop(itemscrib[0], 'span'))
+            print 'Rate item scrib : %s' % title
+        
+        # get rate info
+        rateinfobox = self.getscopbytagattr(soup, 'div', 'class', 'box rate-info-box')
+        if (len(rateinfobox) > 0):
+            bd = self.getscopbytagattr(rateinfobox[0], 'div', 'class', 'bd')
+            if (len(bd) > 0):
+                blist = self.gettableitem(bd[0], 'div')
+                
+                for item in blist:
+                    self.parseproductratedetailbloc(item)
+       
+    def parseproductratedetailbloc(self, soup):
+        # get total people number
+        if ('class' in dict(soup.attrs)):
+            if ('total' == soup['class']):
+                total = self.gettableitem(soup, 'span')
+                if (len(total) > 1):
+                    print 'Total people : %s' % self.gettextonly(total[1])
+            
+        # count x
+        if ('class' in dict(soup.attrs)):
+            if (soup['class'].count('count') > 0):
+                h = self.gettablescop(soup, 'h')
+                if (h != None):
+                    print 'Count5 rate: %s' % self.gettextonly(h)
+                
+                total = self.gettableitem(soup, 'span')
+                if (len(total) > 3):
+                    print 'Count %s people number: %s' % (self.gettextonly(total[0]), self.gettextonly(total[3]))     
+                    
     def parsepage(self):
         if self.soup == None:
             print 'There is no html can be parse'

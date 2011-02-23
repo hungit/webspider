@@ -19,11 +19,19 @@ def main(url):
     mb.setbrowseroptions()
     mb.setagent()
     
+    linklist = []
     # get shop cat list
     catlist = getshoplistbybrowser(mb, url)
     # parse shop list one by one   
     for item in catlist:
-        parseshoplistbybrowser(mb, item)
+        linklist.append(parseshoplistbybrowser(mb, item))
+        break
+    
+    # get shop rate link list
+    for item in linklist:
+        for rate in item:
+            for detail in rate:
+                parseshopratedetailbybrowser(mb, detail)
 
 def getshoplistbybrowser(mb, url):
     page = mb.getpagebyurl(url)
@@ -56,20 +64,31 @@ def parseshoplistbybrowser(mb, url):
     count = 1
     totalpage = 0
     hastotalpage = False
+    ratelinklist = []
     while (url != None):
         page = mb.getpagebyurl(url)
         wp = webparser('taobao', page) 
         wp.parsepage()
         url = wp.getnext()
-        print "== Parse Page %d finished ==" % count
-
+        ratelinklist.append(wp.ratelinklist)
         #if (hastotalpage == False):
         (totalpage, hastotalpage) = wp.gettotalpagenumber()
-            
+        print "== Parse Page %d finished ==" % count
+                   
         if (count < totalpage): 
             count = count + 1
             time.sleep(10)
-        else : break   
+        else : break
+        
+        break
+        
+    return ratelinklist
+
+def parseshopratedetailbybrowser(mb, url):
+    page = mb.getpagebyurl(url)
+    wp = webparser('rate information', page)
+    wp.parseproductratedetail(wp.soup)
+    print "== Parse rate information finished =="
 
 if __name__ == '__main__':
     #url = 'http://shopsearch.taobao.com/browse/shop_search.htm?sort=ratesum_desc&shopf=newsearch&q=ipad'
